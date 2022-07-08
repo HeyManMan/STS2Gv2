@@ -89,6 +89,7 @@ func buildRes(url, data, cmd, mode, filename string, vulNumber int) (res []oneRe
 			log.Panic(err)
 		}
 
+		// todo:文件去重
 		lines := strings.Split(string(d), "\n")
 		if vulNumber == 0 {
 			for _, line := range lines {
@@ -233,6 +234,18 @@ func action(c *cli.Context) error {
 		resC <- r
 		go run(resC, &wg)
 	}
+
+	//go func() {
+	//	for _, r := range res {
+	//		resC <- r
+	//	}
+	//}()
+	//
+	//go func() {
+	//	wg.Add(1)
+	//	run(resC, &wg)
+	//}()
+
 	defer close(resC)
 	wg.Wait()
 	return nil
@@ -247,39 +260,46 @@ func main() {
 			"   ST2SG -u https://test.com/test.action --vn 15 -m check\n",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "m, mode",
+				Name:        "mode",
+				Aliases:     []string{"m"},
 				Usage:       "Work mode, check or exploit",
 				Value:       "check",
 				Destination: &mode,
 			},
 			&cli.IntFlag{
-				Name:        "n, vul",
+				Name:        "vul",
+				Aliases:     []string{"n"},
 				Usage:       "Vulnerability number",
 				Value:       0,
 				Destination: &vulNumber,
 			},
 			&cli.StringFlag{
-				Name:        "u, url",
+				Name:        "url",
+				Aliases:     []string{"u"},
 				Usage:       "Set target url",
 				Destination: &url,
 			},
 			&cli.StringFlag{
-				Name:        "c, cmd",
+				Name:        "cmd",
+				Aliases:     []string{"c"},
 				Usage:       "Exec command(Only works on mode exploit.)",
 				Destination: &cmd,
 			},
 			&cli.StringFlag{
-				Name:        "d, data",
+				Name:        "data",
+				Aliases:     []string{"d"},
 				Usage:       "Specific vulnerability packets",
 				Destination: &data,
 			},
 			&cli.StringFlag{
-				Name:        "f, filename",
+				Name:        "filename",
+				Aliases:     []string{"f"},
 				Usage:       "set target url file",
 				Destination: &filename,
 			},
 			&cli.IntFlag{
-				Name:        "t, thread",
+				Name:        "thread",
+				Aliases:     []string{"t"},
 				Usage:       "set thread",
 				Value:       20,
 				Destination: &thread,
